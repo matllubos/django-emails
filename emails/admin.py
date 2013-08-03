@@ -28,7 +28,7 @@ class MessageAdmin(admin.ModelAdmin):
             border = '#B0A16D'
             color ='#575755'
             status = _('Sending')
-        elif sent_recipitents:
+        elif sent_recipitents or (not waiting_recipitents and not sent_recipitents):
             background = '#C8DE96'
             border = '#94AC5E'
             color ='#585A56'

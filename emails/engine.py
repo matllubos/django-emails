@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from smtplib import SMTP
 
@@ -9,6 +9,7 @@ from email.MIMEImage import MIMEImage
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.encoding import force_unicode
+from django.utils import timezone as datetime
 
 from emails.models import Message, Recipient
 
@@ -16,36 +17,34 @@ class MailSender:
    
     def send_htmlmail(self, sbj, recip, template, context, priority=2, sender=None):
         text = render_to_string(template, context)
-        self.send_mails(sbj, recip, text, context, priority, sender)
-        
+        self.send_mails(sbj, [recip], text, priority, 'html', sender)
         
     def send_htmlmails(self, sbj, recips, template, context, priority=2, sender=None):
         text = render_to_string(template, context)
-        self.send_mails(sbj, recips, text, context, priority, sender)
+        self.send_mails(sbj, recips, text, priority, 'html', sender)
         
-    def send_textmail(self, sbj, recip, text, context, priority=2, sender=None):
-        self.send_mails(sbj, recip, text, context, priority, sender)
+    def send_mail(self, sbj, recip, text, priority=2, type='plain', sender=None):
+        self.send_mails(sbj, [recip], text, priority, type, sender)
         
+    def send_mails(self, sbj, recips, text, priority=2, type='plain', sender=None):
+        if not recips:
+            return
         
-    def send_textmails(self, sbj, recips, text, context, priority=2, sender=None):
-        self.send_mails(sbj, recips, text, context, priority, sender) 
-    
-    
-    def send_mails(self, sbj, recips, priority, type, context, sender=None):
         if not sender:
-            sender = settings.EMAIL_HOST_USER
-        
+            sender = settings.EMAIL_ADDRESS
+
         message = Message.objects.create(
-            context = context,
+            content = text,
             type = type,
             subject = force_unicode(sbj),
-            sender = sender,
-            priority = priority
+            sender_address = sender,
+            priority = priority,
         )  
+        
          
         for recip in recips:   
             Recipient.objects.create(
-                mail = recip,
+                address = recip,
                 message = message
             )        
            
@@ -79,7 +78,9 @@ class MailSender:
     
     def send_batch(self):
         num_send_mails = 0
-        messages = Message.objects.filter(datetime__lte = datetime.now(), pk__in = Recipient.objects.filter(sent = False).values('message')).order_by('priority', '-datetime') 
+        messages = Message.objects.filter(timestamp__lte = datetime.now(), 
+                                          pk__in = Recipient.objects.filter(sent = False).values('message'))\
+                                          .order_by('priority', '-timestamp') 
         out = []
         
         if (not messages.exists()):
@@ -95,7 +96,7 @@ class MailSender:
 
                 count_sent_mails = 0   
                 for recipient in recipients:
-                    self.send(message.subject, recipient.mail, message.content, message.sender, message.type)
+                    self.send(message.subject, recipient.address, message.content, message.sender_address, message.type)
                     recipient.sent = True
                     recipient.save()
                     if num_send_mails == batch: break
@@ -111,7 +112,8 @@ class MailSender:
         return '\n'.join(out)  
     
     def delete_old_messages(self):
-        Message.objects.filter(datetime__lte = datetime.now() - timedelta(days=settings.COUNT_DAYS_TO_DELETE_MAIL)).exclude(pk__in = Recipient.objects.filter(sent = False).values('message')).delete()
+        Message.objects.filter(timestamp__lte = datetime.now() - timedelta(days=settings.COUNT_DAYS_TO_DELETE_MAIL))\
+        .exclude(pk__in = Recipient.objects.filter(sent = False).values('message')).delete()
  
            
         
