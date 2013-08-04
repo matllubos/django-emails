@@ -60,8 +60,8 @@ class SimpleTest(TestCase):
         user = User.objects.create(password='', username='test_user', is_active=True, is_staff=True, 
                                    email = settings.TEST_EMAIL_ADDRESS)
         content_type = ContentType.objects.get_for_model(Example)
-        codename = send_notification.perm_name % content_type.model
-        permission, created = Permission.objects.get_or_create(content_type=content_type, codename=codename)
+        codename = send_notification.perm_codename % content_type.model
+        permission, created = Permission.objects.get_or_create(name=send_notification.perm_name, content_type=content_type, codename=codename)
         user.user_permissions.add(permission)
 
         Example.objects.create(email = settings.TEST_EMAIL_ADDRESS, text = 'test signals', boolean = True)

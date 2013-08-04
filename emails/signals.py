@@ -47,7 +47,8 @@ class DefaultPostSave(object):
 class NotificationPostSave(DefaultPostSave):
     
     models_data = {}
-    perm_name = 'can_receive_notification_%s'
+    perm_codename = 'can_receive_notification_%s'
+    perm_name = 'Can receive notification'
     
     def pre_register(self, sender, **kwargs):
         try:
@@ -68,13 +69,13 @@ class NotificationPostSave(DefaultPostSave):
             
     def get_permission(self, sender):
         content_type = ContentType.objects.get_for_model(sender)
-        codename = self.perm_name % content_type.model
-        permission, created = Permission.objects.get_or_create(content_type=content_type, codename=codename)
+        codename = self.perm_codename % content_type.model
+        permission, created = Permission.objects.get_or_create(name=self.perm_name, content_type=content_type, 
+                                                               codename=codename)
         return permission
                 
     def recipients(self, instance):
         content_type = ContentType.objects.get_for_model(instance)
-        codename = self.perm_name % content_type.model
         perm = self.get_permission(instance.__class__)
         
         users_qs = User.objects.filter(is_active=True, is_staff=True, email__isnull=False).exclude(email__exact='')
