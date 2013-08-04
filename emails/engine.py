@@ -9,7 +9,12 @@ from email.MIMEImage import MIMEImage
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.encoding import force_unicode
-from django.utils import timezone as datetime
+try:
+    # Django 1.5
+    from django.utils import timezone as datetime
+except ImportError, exp:
+    # Django 1.4 and lower
+    from datetime import datetime
 
 from emails.models import Message, Recipient
 
