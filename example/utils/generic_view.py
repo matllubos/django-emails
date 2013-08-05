@@ -36,7 +36,6 @@ class FormView(DjangoFormView):
         return super(FormView, self).form_valid(form)
 
     def form_invalid(self, form):
-        print 'ted'
         if self.message_invalid:
             messages.error(
                 self.request,
