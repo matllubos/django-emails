@@ -1,0 +1,70 @@
+body {
+    background: #eee;
+}
+
+#container {
+    background: white;
+    border: 1px solid #ccc;
+    width: 62em;
+    min-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+}
+
+#content-main {
+    width: 100%;
+}
+
+form {
+    margin-top: 1em;
+}
+
+.form-row {
+    padding: 4px 0;
+    float: left;
+    width: 100%;
+}
+
+.form-row label {
+    float: left;
+    width: 9em;
+    padding-right: 0.5em;
+    line-height: 2em;
+    text-align: right;
+    font-size: 1em;
+    color: #333;
+}
+
+.form-row #id_username, .login .form-row #id_password {
+    width: 14em;
+}
+
+span.help {
+    font-size: 10px;
+    display: block;
+}
+
+.submit-row {
+    clear: both;
+    padding: 1em 0 0 9.4em;
+}
+
+.password-reset-link {
+    text-align: center;
+}
+
+#id_subject {
+	width: 573px;
+}
+
+
+p.successnote {
+	font-size: 12px;
+	display: block;
+	padding: 4px 5px 4px 25px;
+	margin: 0 0 3px 0;
+	border: 1px solid #ddd;
+	color: #666;
+	background: #ffc url(../admin/img/icon_success.gif) 5px .3em no-repeat;
+}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %} 
+
+{% load i18n %}
+
+{% block content %}
+	<div id="container">
+		<!-- Header -->
+		    <div id="header">
+		        <div id="branding">
+					<h1 id="site-name">Django send html mail</h1>
+		        </div> 
+		    </div>
+		<!-- END Header -->
+	
+		<!-- Content -->
+    		<div id="content" class="colM">
+	
+				{% if messages %}
+			    	{% for message in messages %}
+			    		<p class="{{ message.tags }}note">
+							{{ message }}
+						</p>
+			    	{% endfor %}
+				{% endif %}
+				
+				<form action="." method="post">
+					{% csrf_token %}
+					{% for field in form %}
+						<div class="form-row">
+							{{ field.errors }}
+							{{ field.label_tag }}
+							{{ field }}
+						</div>
+					{% endfor %}
+					<div class="submit-row">
+    					<label>&nbsp;</label>
+  						<input type="submit" value="{% trans 'Submit e-mail' %}" />
+					</div>
+				</form>
+			</div>
+		<!-- END Content -->
+	</div>
+{% endblock %}
